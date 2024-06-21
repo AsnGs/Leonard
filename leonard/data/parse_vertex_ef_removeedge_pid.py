@@ -24,11 +24,15 @@ args = parser.parse_args([
     '-output', './leonard/data/vertex200m.npy',
     '-param', './leonard/data/vertex200m.params.json'
 ])
+
+# 转换时间
 def translate_time(time_):
     day=time_.split('.')
     order=int(day[1])
     day=int(day[0])
     return [day, order]
+
+# 获取所有的 key:value 值, 同时保存特定type 的最小值
 def get_dict_allkeys_values(dict_a,values,mins):
         for x in range(len(dict_a)):
             temp_key = list(dict_a.keys())[x]
@@ -83,7 +87,7 @@ def count():
         for j in range(len(key)):
             if tmpdata[j]!='':
                 json_obj[key[j]]=tmpdata[j]
-        values=get_dict_allkeys_values(json_obj,values,mins)
+        values=get_dict_allkeys_values(json_obj,values,mins)  # 保存不同类型值的具体不同值对应索引的字典，{type:{value:index}}
 
     reader=[]
     data=[]
@@ -124,25 +128,25 @@ def handle_normal(json_obj,char2id_dict,id2char_dict,mins,re_values,key_template
         temp_value='eventid:'+str(len(edges[2]))
         child=re_values['hash'][json_obj['childVertexHash']]
         parent=re_values['hash'][json_obj['parentVertexHash']]
-        edges[2].append(child)
+        edges[2].append(child)  # 如果是边就存在 edges[2][3]中
         edges[3].append(parent)
     if 'hash' in tmplist:      # node_hash
         temp_key='hash'
-        if 'pid' in tmplist:
-            edges[0].append(re_values[temp_key][json_obj[temp_key]])
-            edges[1].append(re_values['pid'][json_obj['pid']])
-        temp_value='verteid:'+str(re_values[temp_key][json_obj[temp_key]])
-    for temp_char in str(temp_value):   # 根据字符编码
-        if temp_char not in char2id_dict:
-            end=len(char2id_dict)+2
-            char2id_dict[temp_char]=end
-            id2char_dict[end]=temp_char
-            data_processed_.append(end)
-        else:
-            data_processed_.append(char2id_dict[temp_char])
-    data_processed_.append(0)
-
-    if ','.join(tmplist) not in key_template_dict.keys():
+        if 'pid' in tmplist:  # 如果是节点中的 Pid声明，就存在 edges[0][1]中
+            edges[0].append(re_values[temp_key][json_obj[temp_key]]) # 该 json_obj 对应的 hash 对应的 index
+            edges[1].append(re_values['pid'][json_obj['pid']])  # 该json_obj 对应的 pid 对应的 index
+        temp_value='verteid:'+str(re_values[temp_key][json_obj[temp_key]]) # 该 json_obj 对应的 hash 对应的 index，并构建 verteid:index
+        for temp_char in str(temp_value):   # 根据字符编码
+            if temp_char not in char2id_dict:
+                end=len(char2id_dict)+2
+                char2id_dict[temp_char]=end
+                id2char_dict[end]=temp_char
+                data_processed_.append(end)
+            else:
+                data_processed_.append(char2id_dict[temp_char])
+    data_processed_.append(0)  # 0作为分隔符？
+    # 属性组合模板字典（不同json 可能有的属性组合不同，因为数据丢失）
+    if ','.join(tmplist) not in key_template_dict.keys(): 
         key_template_dict[','.join(tmplist)]=len(key_template_dict.keys())
     key_indx=str(key_template_dict[','.join(tmplist)])
     if key_indx not in char2id_dict:
@@ -155,8 +159,8 @@ def handle_normal(json_obj,char2id_dict,id2char_dict,mins,re_values,key_template
     data_processed_.append(0)
     count=0
     for temp_key in tmplist:
-        if temp_key=='hash':
-            continue
+        if temp_key=='hash':  # 上面处理过了
+            continue  
         else:
             count=count+1
         if temp_key =='startTimestampNanos':
@@ -178,7 +182,7 @@ def handle_normal(json_obj,char2id_dict,id2char_dict,mins,re_values,key_template
             else:
                 data_processed_.append(char2id_dict[temp_char])
         data_processed_.append(0)
-    data_processed_.append(1)
+    data_processed_.append(1)  # 1 作为结尾符
     return data_processed_,edges
 import os
 import pickle
