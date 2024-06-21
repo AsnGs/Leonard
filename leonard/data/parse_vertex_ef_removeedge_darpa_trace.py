@@ -5,6 +5,7 @@ import sys
 import numpy as np
 import json
 import argparse
+# 命令行参数解析
 parser = argparse.ArgumentParser(description='Input')
 parser.add_argument('-param_file', action='store', dest='param_file',
                     help='param file file')
@@ -19,11 +20,13 @@ parser.add_argument('-input_path1', action='store', dest='input_path1',
 args = parser.parse_args()
 import time
 begin_time=time.time()
+# 时间转换函数
 def translate_time(time_):
     day=time_.split('.')
     order=int(day[1])
     day=int(day[0])
     return [day, order]
+# 字典值提取函数
 def get_dict_allkeys_values(dict_a,values,mins):
         # if 'hash' not in dict_a.keys() and 'sequence' not in dict_a.keys():
         #     print(dict_a)
@@ -62,6 +65,7 @@ char2id_dict={}
 import csv
 import copy
 import numpy as np
+# 日志数据处理，读取和处理输入文件，生成 values 和 mins 字典
 def count():
     reader=[]
     data=[]
@@ -104,6 +108,7 @@ def count():
     return values,mins
 
 key_template_dict={}
+# 处理每一条记录，将每条记录转成编码形式，并更新节点和边信息
 def handle_normal(json_obj,char2id_dict,id2char_dict,mins,re_values,key_template_dict,edges,flag=0):
     data_processed_=[]
     obj={}
@@ -190,6 +195,7 @@ edges.append([])
 edges.append([])
 edges.append([])
 error=0
+# 主流程，处理所有数据并保留结果
 re_values,mins=count()
 print('finished')
 data_processed=[]
@@ -257,6 +263,7 @@ f1=open(args.edge_file,'w')
 f1.write(edges1)
 f1.close()
 # exit()
+# 结果保存
 np.save(args.edge_file,edges)
 out = [c for item in data_processed for c in item]
 integer_encoded = np.array(out)
