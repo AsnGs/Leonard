@@ -112,12 +112,13 @@ def count():
     return values,mins
 
 key_template_dict={}
+# 对边进行编码
 def handle_normal(json_obj,char2id_dict,id2char_dict,mins,re_values,key_template_dict,edges,flag=0):
     data_processed_=[]
     obj={}
     temp_value=''
     tmplist=list(json_obj.keys())
-    if 'event id' in tmplist:
+    if 'event id' in tmplist:  # event
         temp_key='event id'
         eventid=re_values[temp_key][json_obj[temp_key]]
         temp_value='eventid:'+str(len(edges[2]))
@@ -125,13 +126,13 @@ def handle_normal(json_obj,char2id_dict,id2char_dict,mins,re_values,key_template
         parent=re_values['hash'][json_obj['parentVertexHash']]
         edges[2].append(child)
         edges[3].append(parent)
-    if 'hash' in tmplist:
+    if 'hash' in tmplist:      # node_hash
         temp_key='hash'
         if 'pid' in tmplist:
             edges[0].append(re_values[temp_key][json_obj[temp_key]])
             edges[1].append(re_values['pid'][json_obj['pid']])
         temp_value='verteid:'+str(re_values[temp_key][json_obj[temp_key]])
-    for temp_char in str(temp_value):
+    for temp_char in str(temp_value):   # 根据字符编码
         if temp_char not in char2id_dict:
             end=len(char2id_dict)+2
             char2id_dict[temp_char]=end
@@ -236,23 +237,23 @@ for i in re_values.keys():
     for j in tmp_dict.keys():
         tmp_list[tmp_dict[j]]=j
     re_values[i]=tmp_list
-tmp_vec=re_values['event id']
+tmp_vec=re_values['event id']  # 记录 offset
 for i in range(len(tmp_vec)):
     tmp_vec[i]=str(int(tmp_vec[i])-mins[1] )
 re_values['event id']=tmp_vec
-edges1=''
+edges1=''   # 保存成字符串
 for i in edges:
     edges1=edges1+str(i)+'\n'
-f1=open(args.edge_file,'w')
+f1=open(args.edge_file,'w')  # 保存成edges200m.npy
 f1.write(edges1)
 f1.close()
 # exit()
 np.save(args.edge_file,edges)
-out = [c for item in data_processed for c in item]
+out = [c for item in data_processed for c in item]  # 把 data_processed 中的所有单个数字保存成一个列表
 integer_encoded = np.array(out)
 integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
-np.save(args.output_path, integer_encoded)
+np.save(args.output_path, integer_encoded)  # 保存成vertex200m.npy
 params = {'id2char_dict':id2char_dict,'char2id_dict':char2id_dict,'mins':mins,'re_values_dict':re_values,'key_template_dict':key_template_dict}
-with open(args.param_file, 'w') as f:
+with open(args.param_file, 'w') as f:  # 保存超参（映射表）到 params.json 中
     json.dump(params, f, indent=4)
 
