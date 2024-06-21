@@ -213,6 +213,7 @@ with open(args.input_path, 'r') as csvfile:
     reader = csv.reader(csvfile)
     for i in reader:
         data.append(i)
+    print('test')
 key=data[0]
 data=data[1:]
 for i in range(len(data)):
