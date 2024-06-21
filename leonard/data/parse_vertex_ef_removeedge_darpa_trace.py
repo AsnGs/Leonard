@@ -17,15 +17,8 @@ parser.add_argument('-edge_file', action='store', dest='edge_file',
                     help='input file path')     
 parser.add_argument('-input_path1', action='store', dest='input_path1',
                     help='input file path')
-# args = parser.parse_args()
-# 模拟命令行输入
-args = parser.parse_args([
-    '-edge_file', './leonard/data/edges200m.npy',
-    '-input_path', './leonard/raw_data/vertex200m.csv',
-    '-input_path1', './leonard/raw_data/edge200m.csv',
-    '-output', './leonard/data/vertex200m.npy',
-    '-param', './leonard/data/vertex200m.params.json'
-])
+args = parser.parse_args()
+
 import time
 begin_time=time.time()
 # 时间转换函数
@@ -34,7 +27,7 @@ def translate_time(time_):
     order=int(day[1])
     day=int(day[0])
     return [day, order]
-# 字典值提取函数
+# 构建所有 key:values 对，属性:{值:索引} （除了部分值 timestampNanos 等）
 def get_dict_allkeys_values(dict_a,values,mins):
         # if 'hash' not in dict_a.keys() and 'sequence' not in dict_a.keys():
         #     print(dict_a)
@@ -42,7 +35,7 @@ def get_dict_allkeys_values(dict_a,values,mins):
         for x in range(len(dict_a)):
             temp_key = list(dict_a.keys())[x]
             temp_value = dict_a[temp_key]
-            if temp_key=='timestampNanos':
+            if temp_key=='timestampNanos':   # 处理 timestampNanos, 
                 if int(dict_a[temp_key])<=mins[0]:
                     mins[0]=int(dict_a[temp_key])
             elif temp_key=='startTimestampNanos':
@@ -56,10 +49,10 @@ def get_dict_allkeys_values(dict_a,values,mins):
                         mins[2]=int(dict_a[temp_key])
                 if temp_key=='size':
                     if int(dict_a[temp_key])<=mins[3]:
-                        mins[3]=int(dict_a[temp_key])
-                if temp_key not in values.keys():
+                            mins[3]=int(dict_a[temp_key])
+                if temp_key not in values.keys():  # temp_key不在 value.keys 中就重新创建一个
                     values[temp_key]={}
-                if str(temp_value) not in values[temp_key].keys():
+                if str(temp_value) not in values[temp_key].keys(): # temp_value 不在 values[temp_key].keys()中
                     values[temp_key][str(temp_value)]=len(values[temp_key].keys())
         return values
 
@@ -78,13 +71,14 @@ def count():
     reader=[]
     data=[]
     recordd={}
+    # 先处理 verterx 文件
     with open(args.input_path, 'r') as csvfile:
         reader = csv.reader(csvfile)
         for i in reader:
             data.append(i)
     key=data[0]
     data=data[1:]
-    mins=[sys.maxsize,sys.maxsize,sys.maxsize,sys.maxsize]
+    mins=[sys.maxsize,sys.maxsize,sys.maxsize,sys.maxsize] # 保存对应的最小值,[timestampNanos, startTimestampNanos, sequence, size]
     values={}
     data_tmp=[]
     counters_list=[]
