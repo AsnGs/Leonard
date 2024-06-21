@@ -17,7 +17,15 @@ parser.add_argument('-edge_file', action='store', dest='edge_file',
                     help='input file path')     
 parser.add_argument('-input_path1', action='store', dest='input_path1',
                     help='input file path')
-args = parser.parse_args()
+# args = parser.parse_args()
+# 模拟命令行输入
+args = parser.parse_args([
+    '-edge_file', './leonard/data/edges200m.npy',
+    '-input_path', './leonard/raw_data/vertex200m.csv',
+    '-input_path1', './leonard/raw_data/edge200m.csv',
+    '-output', './leonard/data/vertex200m.npy',
+    '-param', './leonard/data/vertex200m.params.json'
+])
 import time
 begin_time=time.time()
 # 时间转换函数

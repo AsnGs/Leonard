@@ -23,7 +23,7 @@ parser.add_argument('-params', action='store', dest='params_file',
 args = parser.parse_args()
 with open(args.params_file, 'r') as f:
     params = json.load(f)
-params['re_values_dict'].pop('hash')
+params['re_values_dict'].pop('hash')  # 移除hash 对应的条目
 
 with open(args.params_file+'_s', 'w') as f:
     json.dump(params, f, indent=4)
