@@ -10,7 +10,8 @@ from keras.callbacks import ModelCheckpoint
 # from matplotlib import pyplot
 import keras
 from sklearn.preprocessing import OneHotEncoder
-from keras.layers.normalization import BatchNormalization
+# from keras.layers.normalization import BatchNormalization
+from tensorflow.keras.layers import BatchNormalization
 from keras.layers.advanced_activations import ELU
 import tensorflow as tf
 import numpy as np
@@ -18,6 +19,7 @@ import argparse
 import os
 from keras.callbacks import CSVLogger
 from keras import backend as K
+
 def LSTM_multi(bs,time_steps,alphabet_size):
         model = Sequential()
         model.add(Embedding(alphabet_size, 32, batch_input_shape=(bs, time_steps)))
@@ -27,6 +29,8 @@ def LSTM_multi(bs,time_steps,alphabet_size):
         model.add(Dense(64, activation='relu'))
         model.add(Dense(alphabet_size, activation='softmax'))
         return model
+
+# 带batch_normalization 的 lstm
 def LSTM_multi_bn(bs,time_steps,alphabet_size):
         model = Sequential()
         model.add(Embedding(alphabet_size, 32, batch_input_shape=(bs, time_steps)))
@@ -92,6 +96,7 @@ def biLSTM(bs,time_steps,alphabet_size):
         model.add(Dense(alphabet_size, activation='softmax'))
         return model
 
+#  4层全连接层
 def FC_4layer(bs,time_steps, alphabet_size):
         model = Sequential()
         model.add(Embedding(alphabet_size, 5, batch_input_shape=(bs, time_steps)))

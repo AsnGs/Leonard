@@ -16,6 +16,8 @@ parser.add_argument('-edge_file', action='store', dest='edge_file',
                     help='input file path')     
 parser.add_argument('-input_path1', action='store', dest='input_path1',
                     help='input file path')
+
+# args = parser.parse_args()
 # 模拟命令行输入
 args = parser.parse_args([
     '-edge_file', './leonard/data/edges200m.npy',
@@ -253,7 +255,7 @@ f1.write(edges1)
 f1.close()
 # exit()
 np.save(args.edge_file,edges)
-out = [c for item in data_processed for c in item]  # 把 data_processed 中的所有单个数字保存成一个列表
+out = [c for item in data_processed for c in item]  # data_processed -> flatten
 integer_encoded = np.array(out)
 integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
 np.save(args.output_path, integer_encoded)  # 保存成vertex200m.npy
