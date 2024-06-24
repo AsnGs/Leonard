@@ -5,3 +5,7 @@ leonard/data/vertex200m.params.json_s
 leonard/src/vertex200m.hdf5
 leonard/src/edges200m.txt
 leonard/src/__pycache__/models.cpython-39.pyc
+leonard/src/table200m.params.json
+leonard/data/edges_trace1.txt
+leonard/data/edges200m.txt
+leonard/src/table_trace1.params.json

@@ -35,4 +35,4 @@ converter = tf.lite.TFLiteConverter.from_keras_model(model)
 tflite_model = converter.convert()
 #end=time()
 #print(end-begin)
-open(keras_file+'2048'+args.model, "wb").write(tflite_model)
+open(keras_file+'2048'+args.model, "wb").write(tflite_model)   # lite.h52048vertex200m.hdf5  后面会被删除

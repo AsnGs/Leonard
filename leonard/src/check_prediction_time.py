@@ -50,6 +50,7 @@ def strided_app(a, L, S):  # Window len = L, Stride len/stepsize = S
     return np.lib.stride_tricks.as_strided(
         a, shape=(nrows, L), strides=(S * n, n), writeable=False)
 
+#  不仅进行预测，还收集了预测错误的信息
 def predict_lstm(data_x,data_y, inds,timesteps, alphabet_size, model_name,batch_size):
         X=np.array(data_x)
         Y=data_y
@@ -82,7 +83,7 @@ def predict_lstm(data_x,data_y, inds,timesteps, alphabet_size, model_name,batch_
             #print(end_-begin_time_)
             for pro in prob_tmp:
                 prob.append(pro)
-        table_item=[]
+        table_item=[]  # 记录错误信息列表，其中每个元素是一个包含两个字符串的列表，一个是str(j-begin) 是错误在当前序列中的相对位置，另一个str(Y[j]) 是正确的标签
         #prob = model.predict(X, batch_size=len(Y))
         for i in range(len(inds)):
             table_item_=[]
@@ -93,8 +94,8 @@ def predict_lstm(data_x,data_y, inds,timesteps, alphabet_size, model_name,batch_
                 begin=inds[i-1]
                 end=inds[i]
             for j in range(begin,end):
-                if np.argmax(prob[j])!=Y[j]:
-                    table_item_.append([str(j-begin),str(Y[j])])  
+                if np.argmax(prob[j])!=Y[j]: # 比较预测与真实标签
+                    table_item_.append([str(j-begin),str(Y[j])])
             table_item.append(table_item_)
         #print('each iter time')
         #print(time()-begin1)
@@ -186,7 +187,7 @@ def main():
             table_item=predict_lstm(data_sub_x,data_sub_y,inds, timesteps, alphabet_size, args.model_name,batchsize)
             for i in range(batch_size):
                 error=len(table_item[i])
-                if error>0:
+                if error>0:  # 如果有错误，就添加到列表中，分别是错误数量和序列索引
                     table[timestamp[i]]=table_item[i]
                     error_.append(error)
                     order_.append(batch_size*j+i)
@@ -227,6 +228,7 @@ def main():
         print(time()-additional_save_time)
         write_time=time()
         print('write time')
+        # 最后将错误存到json中，table200m.params.json, 即纠错表
         with open(args.table_file, 'w') as f:
             json.dump(table, f, indent=4)
         end_time=time()
@@ -235,7 +237,16 @@ def main():
         print(end_time-begin_time)
         print('read time is')
 
-                                        
+                        
 if __name__ == "__main__":
         main()
 
+'''
+主要流程：
+
+数据准备：加载 NPY 文件中的序列数据，并进行必要的预处理。
+批处理：将数据分成多个批次，每个批次 2048 个样本。
+预测：对每个批次使用 TFLite 模型进行预测。
+错误分析：收集预测错误的信息，包括错误位置和正确标签。
+结果保存：将错误信息保存到 JSON 文件中。
+'''
